@@ -1,0 +1,74 @@
+{% extends 'backend/master.html' %} {% block content %}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Create group</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a href="{% url 'group_list' %}"><button class="btn btn-success">List group</button></a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <!-- Default box -->
+  <div class="card">
+    <!-- form start -->
+    <form method="post">
+      {% csrf_token %}
+      <div class="card-body">
+        <!-- Group Name Input -->
+        <div class="form-group">
+          <label for="group_name">Group name</label>
+          <input type="text" class="form-control {% if form.name.errors %} is-invalid{% endif %}" name="name" id="group_name" placeholder="Enter group name" />
+          {% if form.name.errors %}
+          <div class="invalid-feedback">{% for error in form.name.errors %} {{ error }} {% endfor %}</div>
+          {% endif %}
+        </div>
+
+        <!-- Permissions Table -->
+        {% regroup all_permissions by content_type.model as permission_list %} {% for model_permissions in permission_list %}
+        <div class="form-group">
+          <h4>{{ model_permissions.grouper }}</h4>
+          <table class="table table-bordered">
+            <tbody>
+              {% for permission in model_permissions.list %} {% if forloop.counter0|divisibleby:4 %}
+              <tr>
+                {% endif %}
+                <td style="width: 25%">
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="permission_{{ permission.id }}" name="permissions" value="{{ permission.id }}" />
+                    <label class="custom-control-label" for="permission_{{ permission.id }}">{{ permission.codename }}</label>
+                  </div>
+                </td>
+                {% if forloop.counter|divisibleby:4 or forloop.last %}
+              </tr>
+              {% endif %} {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endfor %}
+      </div>
+      <!-- /.card-body -->
+
+      <!-- Submit Button -->
+      <div class="card-footer">
+        <button type="submit" class="form-control btn btn-primary">Submit</button>
+      </div>
+    </form>
+  </div>
+  <!-- /.card -->
+</section>
+<!-- /.content -->
+{% endblock content %} {% block js %}
+<!-- Additional JS scripts can be added here if needed -->
+{% endblock js %}

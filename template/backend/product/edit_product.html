@@ -1,0 +1,144 @@
+{% extends 'backend/master.html' %}
+{% block title %}Edit Product{% endblock title %}
+{% load static %}
+{% block style %}
+
+{% endblock style %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Edit Product</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_product' %}">
+          <button class="btn btn-success btn-sm float-right">Product List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <form method="POST" action="{% url 'edit_product' product.id %}" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- Display general form errors -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <table class="table table-bordered">
+            <!-- Name field -->
+            <tr>
+              <td><label for="name">Product Name</label></td>
+              <td>
+                <input type="text" class="form-control" id="name" name="name" value="{{ form.name.value|default_if_none:'' }}" placeholder="Enter product name" />
+                <span class="text-danger">{{ form.name.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Short description field -->
+            <tr>
+              <td><label for="short_description">Short Description</label></td>
+              <td>
+                <input type="text" class="form-control" id="short_description" name="short_description" value="{{ form.short_description.value|default_if_none:'' }}" placeholder="Enter short description" />
+                <span class="text-danger">{{ form.short_description.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- SKU field -->
+            <tr>
+              <td><label for="sku">SKU</label></td>
+              <td>
+                <input type="text" class="form-control" id="sku" name="sku" value="{{ form.sku.value|default_if_none:'' }}" readonly/>
+                <span class="text-danger">{{ form.sku.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Description field -->
+            <tr>
+              <td><label for="description">Description</label></td>
+              <td>
+                <textarea class="form-control" id="description" name="description" placeholder="Enter full description">{{ form.description.value|default_if_none:'' }}</textarea>
+                <span class="text-danger">{{ form.description.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Image field -->
+            <tr>
+              <td><label for="image">Product Image</label></td>
+              <td>
+                <input type="file" class="form-control" name="image" id="image" onchange="previewImage(event)" />
+                {% if product.image %}
+                  <div>
+                    <label>Current Image</label><br />
+                    <img src="{{ product.image.url }}" style="height: 100px; width: 100px; border: 1px solid black;">
+                  </div>
+                {% endif %}
+                <div>
+                    <label>Image Preview</label><br />
+                    <img id="preview" style="height: 100px; width: 100px; border: 1px solid black; display: none;" />
+                </div>
+                {% if form.image.errors %}
+                    <span class="text-danger">
+                        {% for error in form.image.errors %}
+                            {{ error }}<br>
+                        {% endfor %}
+                    </span>
+                {% endif %}
+              </td>
+            </tr>
+
+            <!-- Attribute1 field -->
+            <tr>
+              <td><label for="attribute1">Attribute 1</label></td>
+              <td>
+                {{ form.attribute1 }}
+                <span class="text-danger">{{ form.attribute1.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Attribute2 field -->
+            <tr>
+              <td><label for="attribute2">Attribute 2</label></td>
+              <td>
+                {{ form.attribute2 }}
+                <span class="text-danger">{{ form.attribute2.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Submit button -->
+            <tr>
+              <td colspan="2">
+                <input type="submit" class="btn btn-success btn-block" value="Update" />
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+  function previewImage(event) {
+    var input = event.target;
+    var preview = document.getElementById("preview");
+    preview.src = URL.createObjectURL(input.files[0]);
+    preview.style.display = "block";
+  }
+</script>
+{% endblock js %}

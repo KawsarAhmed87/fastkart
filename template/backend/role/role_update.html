@@ -1,0 +1,107 @@
+{% extends 'backend/master.html' %} {% block content %}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        {% load static %}
+        <h1>User role</h1>
+      </div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item">
+            <a href="{% url 'role_list' %}"><button class="btn btn-success">User role list</button></a>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-5">
+          <!-- Profile Image -->
+          <div class="card card-primary card-outline">
+            <div class="card-body box-profile">
+              <div class="text-center">
+                <!-- User profile picture -->
+                <img class="profile-user-img img-fluid img-circle" {% if user.image %} src="{{ user.image.url }}" {% else %} src="{% static 'backend/dist/img/user_demo_112233.png' %}" {% endif %} alt="User profile picture" />
+              </div>
+
+              <!-- User's name -->
+              <h3 class="profile-username text-center">{{ user.name }}</h3>
+
+              <!-- Dynamically display user roles -->
+              <p class="text-muted text-center">{% if user.groups.all %} {% for group in user.groups.all %} {{ group.name }}{% if not forloop.last %}, {% endif %} {% endfor %} {% else %} No roles assigned {% endif %}</p>
+
+              <!-- Role selection -->
+              <div class="list-group list-group-unbordered mb-3">
+                <h5>Select role</h5>
+                <input type="text" name="user_id" value="{{user.id}}" hidden />
+                {% for group in groups %}
+                <div class="custom-control custom-switch ml-5">
+                  <input type="checkbox" class="custom-control-input" id="group_{{ group.id }}" name="groups" value="{{ group.id }}" {% if group in user.groups.all %}checked{% endif %} />
+                  <label class="custom-control-label" for="group_{{ group.id }}">{{ group.name }}</label>
+                </div>
+                {% endfor %}
+              </div>
+
+              <!-- Submit button -->
+              <button type="submit" class="btn btn-primary btn-block">Submit</button>
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-7">
+          <!-- Permissions card -->
+          <div class="card">
+            <div class="card-header p-2">
+              <ul class="nav nav-pills">
+                <li class="nav-item">
+                  <a class="nav-link">Permission</a>
+                </li>
+              </ul>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <!-- Group permissions by model type -->
+              {% regroup all_permissions by content_type.model as permission_list %} {% for model_permissions in permission_list %}
+              <div class="form-group">
+                <!-- Model type header -->
+                <h4>{{ model_permissions.grouper }}</h4>
+                <ul>
+                  <!-- List each permission -->
+                  {% for permission in model_permissions.list %}
+                  <li style="list-style-type: none">
+                    <div class="custom-control custom-switch">
+                      <input type="checkbox" class="custom-control-input" id="permission_{{ permission.id }}" name="permissions" value="{{ permission.id }}" {% if permission in user.user_permissions.all %}checked{% endif %} />
+                      <label class="custom-control-label" for="permission_{{ permission.id }}">{{ permission.codename }}</label>
+                    </div>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              <hr />
+              {% endfor %}
+            </div>
+            <!-- /.card-body -->
+          </div>
+          <!-- /.card -->
+        </div>
+        <!-- /.col -->
+      </div>
+    </form>
+    <!-- /.row -->
+  </div>
+  <!-- /.container-fluid -->
+</section>
+<!-- /.content -->
+{% endblock content %}

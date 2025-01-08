@@ -1,0 +1,153 @@
+{% extends 'backend/master.html' %}
+{% block title %}Add Supplier{% endblock title %}
+{% load static %}
+{% block style %}
+<!-- Add any custom styles here if needed -->
+{% endblock style %}
+
+{% block content %}
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Create New Supplier</h1>
+            </div>
+            <div class="col-sm-6">
+                <a href="{% url 'list_supplier' %}">
+                    <button class="btn btn-success btn-sm float-right">Supplier List</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-default">
+            <div class="card-body">
+                <form method="POST" action="{% url 'create_supplier' %}">
+                    {% csrf_token %}
+
+                    <!-- Display general form errors -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="text-danger">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <table class="table table-bordered">
+                        <!-- Name field -->
+                        <tr>
+                            <td><label for="name">Supplier Name</label></td>
+                            <td>
+                                <input type="text" class="form-control" id="name" name="name" value="{{ form.name.value|default_if_none:'' }}" placeholder="Enter supplier name" required />
+                                <span class="text-danger">{{ form.name.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Contact Name field -->
+                        <tr>
+                            <td><label for="contact_name">Contact Name</label></td>
+                            <td>
+                                <input type="text" class="form-control" id="contact_name" name="contact_name" value="{{ form.contact_name.value|default_if_none:'' }}" placeholder="Enter contact name" />
+                                <span class="text-danger">{{ form.contact_name.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Phone field -->
+                        <tr>
+                            <td><label for="phone">Phone</label></td>
+                            <td>
+                                <input type="text" class="form-control" id="phone" name="phone" value="{{ form.phone.value|default_if_none:'' }}" placeholder="Enter phone number" />
+                                <span class="text-danger">{{ form.phone.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Email field -->
+                        <tr>
+                            <td><label for="email">Email</label></td>
+                            <td>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ form.email.value|default_if_none:'' }}" placeholder="Enter email" />
+                                <span class="text-danger">{{ form.email.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Address field -->
+                        <tr>
+                            <td><label for="address">Address</label></td>
+                            <td>
+                                <textarea class="form-control" id="address" name="address" placeholder="Enter address">{{ form.address.value|default_if_none:'' }}</textarea>
+                                <span class="text-danger">{{ form.address.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Bank Name field -->
+                        <tr>
+                            <td><label for="bank_name">Bank Name</label></td>
+                            <td>
+                                <input type="text" class="form-control" id="bank_name" name="bank_name" value="{{ form.bank_name.value|default_if_none:'' }}" placeholder="Enter bank name" />
+                                <span class="text-danger">{{ form.bank_name.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Bank Account Name field -->
+                        <tr>
+                            <td><label for="account_name">Bank Account Name</label></td>
+                            <td>
+                                <input type="text" class="form-control" id="account_name" name="account_name" value="{{ form.account_name.value|default_if_none:'' }}" placeholder="Enter bank account name" />
+                                <span class="text-danger">{{ form.account_name.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Account Number field -->
+                        <tr>
+                            <td><label for="account_number">Account Number</label></td>
+                            <td>
+                                <input type="text" class="form-control" id="account_number" name="account_number" value="{{ form.account_number.value|default_if_none:'' }}" placeholder="Enter account number" />
+                                <span class="text-danger">{{ form.account_number.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Bank Branch field -->
+                        <tr>
+                            <td><label for="bank_branch">Bank Branch</label></td>
+                            <td>
+                                <input type="text" class="form-control" id="bank_branch" name="bank_branch" value="{{ form.bank_branch.value|default_if_none:'' }}" placeholder="Enter bank branch" />
+                                <span class="text-danger">{{ form.bank_branch.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Status field as a switch button -->
+                        <tr>
+                            <td><label for="status">Status</label></td>
+                            <td>
+                                <label class="switch">
+                                    <input type="checkbox" id="status" name="status" {% if form.is_bound and form.status.value %} checked {% endif %} />
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="text-danger">{{ form.status.errors.0 }}</span>
+                            </td>
+                        </tr>
+
+                        <!-- Submit button -->
+                        <tr>
+                            <td colspan="2">
+                                <input type="submit" class="btn btn-success btn-block" value="Submit" />
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+    // You can add any additional JavaScript here
+</script>
+{% endblock js %}

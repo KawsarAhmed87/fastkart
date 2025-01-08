@@ -1,0 +1,133 @@
+{% extends 'backend/master.html' %}
+{% block title %}Add Attribute{% endblock title %}
+{% load static %}
+{% block style %}
+<!-- Add any custom styles here -->
+{% endblock style %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Create New Attribute</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_attribute' %}">
+          <button class="btn btn-success btn-sm float-right">Attribute List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <form method="POST" action="{% url 'create_attribute' %}">
+          {% csrf_token %}
+
+          <!-- Display general form errors -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <table class="table table-bordered">
+            <!-- Name field -->
+            <tr>
+              <td><label for="name">Attribute Name</label></td>
+              <td>
+                <input type="text" class="form-control" id="name" name="name" value="{{ form.name.value|default_if_none:'' }}" placeholder="Enter attribute name" />
+                <span class="text-danger">{{ form.name.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Option field -->
+            <tr>
+              <td><label for="option">Display Option</label></td>
+              <td>
+                <select class="form-control" id="option" name="option">
+                  <option value="">Select Option</option>
+                  {% for option_value, option_label in form.fields.option.choices %}
+                    <option value="{{ option_value }}" {% if form.option.value == option_value %} selected {% endif %}>{{ option_label }}</option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger">{{ form.option.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Values field with dynamic input -->
+            <tr>
+              <td><label for="values">Values</label></td>
+              <td>
+                <div id="values-container">
+                  <div class="input-group mb-2">
+                    <input type="text" class="form-control" name="values[]" placeholder="Enter value" />
+                  </div>
+                </div>
+                <span class="text-danger">{{ form.values.errors.0 }}</span>
+                <small class="form-text text-muted">Add multiple values using the 'add more +' button.</small>
+                <div class="input-group mb-2" id="add-value-button">
+                  <button type="button" class="btn btn-primary btn-sm add-value">Add more +</button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Status field as a switch button -->
+            <tr>
+              <td><label for="status">Status</label></td>
+              <td>
+                <label class="switch">
+                  <input type="checkbox" id="status" name="status" {% if form.is_bound and form.status.value %} checked {% endif %} />
+                  <span class="slider round"></span>
+                </label>
+                <span class="text-danger">{{ form.status.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Submit button -->
+            <tr>
+              <td colspan="2">
+                <input type="submit" class="btn btn-success btn-block" value="Submit" />
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+{% block js %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const valuesContainer = document.getElementById("values-container");
+    const addValueButton = document.getElementById("add-value-button");
+
+    // Always make sure the add button stays last
+    valuesContainer.appendChild(addValueButton);
+
+    valuesContainer.addEventListener("click", (event) => {
+      if (event.target.classList.contains("add-value")) {
+        const newInputGroup = document.createElement("div");
+        newInputGroup.classList.add("input-group", "mb-2");
+        newInputGroup.innerHTML = `
+          <input type="text" class="form-control" name="values[]" placeholder="Enter value" />
+          <div class="input-group-append">
+            <button type="button" class="btn btn-danger remove-value">-</button>
+          </div>
+        `;
+        valuesContainer.insertBefore(newInputGroup, addValueButton); // Insert before the button
+      } else if (event.target.classList.contains("remove-value")) {
+        event.target.closest(".input-group").remove();
+      }
+    });
+  });
+</script>
+{% endblock js %}

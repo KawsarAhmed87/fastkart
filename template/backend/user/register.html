@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Registration</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'backend/plugins/fontawesome-free/css/all.min.css' %}" />
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="{% static 'backend/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}" />
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{% static 'backend/dist/css/adminlte.min.css' %}" />
+    <style>
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body class="hold-transition login-page">
+    <div class="login-box">
+      <div class="login-logo">
+        <a><b>Regist</b>er</a>
+      </div>
+      <div class="card">
+        <div class="card-body login-card-body">
+          {% if messages %} {% for message in messages %}
+          <p {% if message.tags %} class="{{ message.tags }} text-center" {% endif %}>{{ message }}</p>
+          {% endfor %} {% endif %}
+
+          <form method="POST" action="{% url 'register_page' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <label for="name">Name:</label>
+              <input type="text" class="form-control" id="name" placeholder="Enter your name" name="name" />
+              <span class="error">{{form.name.errors}}</span>
+            </div>
+            <div class="form-group">
+              <label for="email">Email: </label>
+              <input type="email" class="form-control" id="email" placeholder="Enter your email" name="email" />
+              <span class="error">{{form.email.errors}}</span>
+            </div>
+            <div class="form-group">
+              <label for="password">Password:</label>
+              <input type="password" class="form-control" id="password" placeholder="Enter your password" name="password1" required />
+              <span class="error">{{form.password1.errors}}</span>
+            </div>
+            <div class="form-group">
+              <label for="confirm-password">Confirm Password:</label>
+              <input type="password" class="form-control" id="confirm-password" placeholder="Confirm your password" name="password2" required />
+              <span class="error">{{form.password2.errors}}</span>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+        <!-- /.login-card-body -->
+      </div>
+    </div>
+    <!-- /.login-box -->
+
+    <!-- jQuery -->
+    <script src="{% static 'backend/plugins/jquery/jquery.min.js' %}"></script>
+    <!-- Bootstrap 4 -->
+    <script src="{% static 'backend/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- AdminLTE App -->
+    <script src="{% static 'backend/dist/js/adminlte.min.js' %}"></script>
+  </body>
+</html>

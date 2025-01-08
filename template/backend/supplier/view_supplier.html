@@ -1,0 +1,78 @@
+{% extends 'backend/master.html' %}
+
+{% block title %}View Supplier{% endblock title %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Supplier Details</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_supplier' %}">
+          <button class="btn btn-success btn-sm float-right">Supplier List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <th>Name</th>
+              <td>{{ supplier.name }}</td>
+            </tr>
+            <tr>
+              <th>Contact Name</th>
+              <td>{{ supplier.contact_name }}</td>
+            </tr>
+            <tr>
+              <th>Phone</th>
+              <td>{{ supplier.phone }}</td>
+            </tr>
+            <tr>
+              <th>Email</th>
+              <td>{{ supplier.email }}</td>
+            </tr>
+            <tr>
+              <th>Address</th>
+              <td>{{ supplier.address }}</td>
+            </tr>
+            <tr>
+              <th>Bank Name</th>
+              <td>{{ supplier.bank_name }}</td>
+            </tr>
+            <tr>
+              <th>Account Name</th>
+              <td>{{ supplier.account_name }}</td>
+            </tr>
+            <tr>
+              <th>Account Number</th>
+              <td>{{ supplier.account_number }}</td>
+            </tr>
+            <tr>
+              <th>Bank Branch</th>
+              <td>{{ supplier.bank_branch }}</td>
+            </tr>
+            <tr>
+              <th>Status</th>
+              <td>{% if supplier.status %}Active{% else %}Inactive{% endif %}</td>
+            </tr>
+            <tr>
+              <td colspan="2" class="text-center">
+                <a href="{% url 'edit_supplier' supplier.id %}" class="btn btn-primary">Edit Supplier</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

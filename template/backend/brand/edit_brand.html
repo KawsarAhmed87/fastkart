@@ -1,0 +1,107 @@
+{% extends 'backend/master.html' %}
+{% block title %}Edit Brand{% endblock title %}
+{% load static %}
+
+{% block style %}
+
+{% endblock style %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Edit Brand</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_brand' %}">
+          <button class="btn btn-success btn-sm float-right">Brand List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <form method="POST" action="{% url 'edit_brand' brand.id %}" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- Display form-level errors -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <table class="table table-bordered">
+            <!-- Name field -->
+            <tr>
+              <td><label for="name">Brand Name</label></td>
+              <td>
+                <input type="text" class="form-control" id="name" name="name" value="{{ form.name.value|default_if_none:'' }}" placeholder="Enter brand name" />
+                <span class="text-danger">{{ form.name.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Logo field -->
+            <tr>
+              <td><label for="logo">Brand Logo</label></td>
+              <td>
+                <input type="file" class="form-control" name="logo" id="logo" onchange="previewImage(event)" />
+                {% if brand.logo %}
+                  <label>Current Logo:</label><br />
+                  <img src="{{ brand.logo.url }}" style="height: 60px; width: 60px; border: 1px solid black;" />
+                {% endif %}
+                <div>
+                  <label>New Logo Preview:</label><br />
+                  <img id="preview" style="height: 100px; width: 100px; border: 1px solid black; display: none;" />
+                </div>
+                <span class="text-danger">{{ form.logo.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Status field as a switch button -->
+            <tr>
+                <td><label for="status">Status</label></td>
+                <td>
+                    <label class="switch">
+                        <input type="checkbox" id="status" name="status" 
+                            {% if form.is_bound %}
+                                {% if form.status.value %} checked {% endif %}
+                            {% elif brand.status %} checked {% endif %} 
+                        />
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="text-danger">{{ form.status.errors.0 }}</span>
+                </td>
+            </tr>
+            
+            <!-- Submit button -->
+            <tr>
+              <td colspan="2">
+                <input type="submit" class="btn btn-success btn-block" value="Update Brand" />
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+{% block js %}
+<script>
+  function previewImage(event) {
+    var input = event.target;
+    var preview = document.getElementById("preview");
+    preview.src = URL.createObjectURL(input.files[0]);
+    preview.style.display = "block";
+  }
+</script>
+{% endblock js %}
