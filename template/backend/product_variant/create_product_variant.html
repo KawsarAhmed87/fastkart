@@ -1,0 +1,135 @@
+{% extends 'backend/master.html' %}
+{% block title %}Create Product Variant{% endblock title %}
+{% load static %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Create Product Variant</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_product_variants' product.id %}">
+          <button class="btn btn-success btn-sm float-right">Product Variant List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <form method="POST" action="{% url 'create_product_variant' product.id %}" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <table class="table table-bordered">
+            <!-- Product Selection -->
+            <tr>
+              <td><label for="product">Product</label></td>
+              <td>{{product.name}}</td>
+            </tr>
+
+            <!-- Attribute 1 -->
+            <tr>
+              <td>
+                <label for="attribute1">{{ product.attribute1.name }}</label> <!-- Show attribute name -->
+              </td>
+              <td>
+                <select name="attribute1_value" id="attribute1" class="form-control">
+                  <option value="">Select {{ attribute1.name }}</option> <!-- Show attribute name in dropdown -->
+                  {% for attr_value in product.attribute1.values.all %}
+                    <option value="{{ attr_value.id }}" {% if form.attribute1_value.value == attr_value.id %}selected{% endif %}>
+                      {{ attr_value.value }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger">{{ form.attribute1_value.errors.0 }}</span>
+              </td>
+            </tr>
+            
+            <!-- Attribute 2 -->
+            <tr>
+              <td>
+                <label for="attribute2">{{ product.attribute2.name }}</label> <!-- Show attribute name -->
+              </td>
+              <td>
+                <select name="attribute2_value" id="attribute2" class="form-control">
+                  <option value="">Select {{ attribute2.name }}</option> <!-- Show attribute name in dropdown -->
+                  {% for attr_value in product.attribute2.values.all %}
+                    <option value="{{ attr_value.id }}" {% if form.attribute2_value.value == attr_value.id %}selected{% endif %}>
+                      {{ attr_value.value }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger">{{ form.attribute2_value.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Price -->
+            <tr>
+              <td><label for="price">Price</label></td>
+              <td>
+                <input type="number" class="form-control" id="price" name="price" value="{{ form.price.value|default_if_none:'' }}" placeholder="Enter price" step="0.01" />
+                <span class="text-danger">{{ form.price.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Image Upload -->
+            <tr>
+              <td><label for="image">Product Image</label></td>
+              <td>
+                <input type="file" class="form-control" name="image" id="image" onchange="previewImage(event)" />
+                <span class="text-danger">
+                    {% for error in form.image.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
+                </span>
+                <div>
+                    <label>Image Preview</label><br />
+                    <img id="preview" src="{% if form.image.value %}{{ form.image.value.url }}{% endif %}" style="height: 100px; width: 100px; border: 1px solid black; {% if form.image.value %}display:block{% else %}display:none{% endif %};" />
+                </div>
+              </td>
+            </tr>
+
+            <!-- Submit Button -->
+            <tr>
+              <td colspan="2">
+                <input type="submit" class="btn btn-success btn-block" value="Submit" />
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}
+
+{% block js %}
+<script>
+  function previewImage(event) {
+    var input = event.target;
+    var preview = document.getElementById("preview");
+    if (input.files && input.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = "block"; // Display the preview image
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+</script>
+{% endblock js %}

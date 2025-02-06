@@ -33,9 +33,10 @@
             <tr>
               <th width="10%">SL</th>
               <th width="25%">Name</th>
-              <th width="20%">SKU</th>
+              <th width="15%">SKU</th>
               <th width="15%">Image</th>
-              <th width="15%">Status</th>
+              <th width="10%">Status</th>
+              <th width="10%">Variant</th>
               <th width="15%">Action</th>
             </tr>
           </thead>
@@ -60,6 +61,14 @@
                 {% endif %}
               </td>
               <td>
+                <a href="{% url 'create_product_variant' product.id %}">
+                  <button class="btn btn-sm btn-primary">Add</button>
+                </a>
+              </td>
+              <td>
+                <a href="{% url 'view_product' product.id %}">
+                  <button class="btn btn-sm btn-success">View</button>
+                </a>
                 <a href="{% url 'edit_product' product.id %}">
                   <button class="btn btn-sm btn-info">Edit</button>
                 </a>

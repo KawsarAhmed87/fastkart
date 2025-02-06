@@ -1,0 +1,81 @@
+{% extends 'backend/master.html' %}
+{% block title %}View Product{% endblock title %}
+{% load static %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Product Details</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_product' %}">
+          <button class="btn btn-success btn-sm float-right">Product List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <table class="table table-bordered">
+          <tr>
+            <td width="30%"><strong>Product Name:</strong></td>
+            <td width="70%">{{ product.name }}</td>
+          </tr>
+          <tr>
+            <td><strong>Short Description:</strong></td>
+            <td>{{ product.short_description }}</td>
+          </tr>
+          <tr>
+            <td><strong>Description:</strong></td>
+            <td>{{ product.description }}</td>
+          </tr>
+          <tr>
+            <td><strong>Category:</strong></td>
+            <td>{{ product.category }}</td>
+          </tr>
+          <tr>
+            <td><strong>Brand:</strong></td>
+            <td>{{ product.brand }}</td>
+          </tr>
+          <tr>
+            <td><strong>Attribute 1:</strong></td>
+            <td>{{ product.attribute1 }}</td>
+          </tr>
+          <tr>
+            <td><strong>Attribute 2:</strong></td>
+            <td>{{ product.attribute2 }}</td>
+          </tr>
+          <tr>
+            <td><strong>SKU:</strong></td>
+            <td>{{ product.sku }}</td>
+          </tr>
+          <tr>
+            <td><strong>Status:</strong></td>
+            <td>{% if product.status %} Active {% else %} Inactive {% endif %}</td>
+          </tr>
+          <tr>
+            <td><strong>Image:</strong></td>
+            <td>
+              {% if product.image %}
+                <img src="{{ product.image.url }}" style="height: 100px; width: 100px; border: 1px solid black;">
+              {% else %}
+                No image available
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+
+        <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">Edit Product</a>
+        <a href="{% url 'list_product' %}" class="btn btn-secondary">Back to List</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}
