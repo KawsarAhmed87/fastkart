@@ -65,7 +65,7 @@
               </td>
               <td>
                 <select name="attribute2_value" id="attribute2" class="form-control">
-                  <option value="">Select {{ attribute2.name }}</option> <!-- Show attribute name in dropdown -->
+                  <option value="">Select {{ attribute2.name }}</option> <!-- Show attribute name in dropdown-->
                   {% for attr_value in product.attribute2.values.all %}
                     <option value="{{ attr_value.id }}" {% if form.attribute2_value.value == attr_value.id %}selected{% endif %}>
                       {{ attr_value.value }}
