@@ -1,0 +1,157 @@
+{% extends 'backend/master.html' %}
+{% block title %}Create Purchase{% endblock title %}
+{% load static %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Create New Purchase</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_purchase' %}">
+          <button class="btn btn-success btn-sm float-right">Purchase List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <form method="POST">
+          {% csrf_token %}
+
+          <table class="table table-bordered">
+            <tr>
+              <td><label for="purchase_date">Purchase Date</label></td>
+              <td><input type="date" class="form-control" name="date" required></td>
+            </tr>
+
+            <tr>
+              <td><label>Paid By</label></td>
+              <td>
+                <select class="form-control" name="paid_by" required>
+                  <option value="cash">Cash</option>
+                  <option value="bank">Bank</option>
+                  <option value="account-payable">Account Payable</option>
+                </select>
+              </td>
+            </tr>
+
+            <tr>
+              <td><label>Supplier</label></td>
+              <td>
+                <select class="form-control" name="supplier" required>
+                  <option value="">Select Supplier</option>
+                  {% for supplier in suppliers %}
+                    <option value="{{ supplier.id }}">{{ supplier.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+            </tr>
+
+            <tr>
+              <td colspan="2">
+                <h3>Products</h3>
+                <table class="table table-bordered" id="productTable">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Price</th>
+                      <th>Quantity</th>
+                      <th>Subtotal</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+                <button type="button" class="btn btn-primary btn-sm" id="addProductBtn">Add Product</button>
+              </td>
+            </tr>
+
+            <tr>
+              <td><label>Total Amount</label></td>
+              <td>
+                <h3 id="totalAmount">0.00</h3>
+                <input type="hidden" name="total_amount" id="total_amount_input" value="0.00">
+              </td>
+            </tr>
+
+            <tr>
+              <td colspan="2"><input type="submit" class="btn btn-success btn-block" value="Submit"></td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock content %}
+
+{% block js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+  
+  let productCount = 0;
+
+  function calculateTotal() {
+      let total = 0;
+      $(".subtotal").each(function () {
+          total += parseFloat($(this).text()) || 0;
+      });
+      $("#totalAmount").text(total.toFixed(2));
+      $("#total_amount_input").val(total.toFixed(2));
+  }
+
+  $("#addProductBtn").click(function () {
+      productCount++;
+
+      let productOptions = `<option value="">Select Product</option>`;
+      {% for productvariant in variants %}
+          productOptions += `<option value="{{ productvariant.id }}">{{ productvariant.product.name }} ({{productvariant.attribute1_value.attribute.name}}:{{productvariant.attribute1_value.value}}, {{productvariant.attribute2_value.attribute.name}}:{{productvariant.attribute2_value.value}})</option>`;
+      {% endfor %}
+
+      $("#productTable tbody").append(`
+          <tr id="row${productCount}">
+              <td>
+                  <select name="products[]" class="product-select form-control">
+                      ${productOptions}
+                  </select>
+              </td>
+              <td><input type="number" name="prices[]" class="product-price form-control" value="" min="0" step=""></td>
+              <td><input type="number" name="quantities[]" class="quantity form-control" value="1" min="1"></td>
+              <td class="subtotal">0.00</td>
+              <td><button type="button" class="btn btn-danger btn-sm remove-btn" onclick="removeProduct(${productCount})">Remove</button></td>
+          </tr>
+      `);
+  });
+
+  function removeProduct(id) {
+      $("#row" + id).remove();
+      calculateTotal();
+  }
+
+  $(document).on("input", ".product-price, .quantity", function () {
+      let row = $(this).closest("tr");
+      let price = parseFloat(row.find(".product-price").val()) || 0;
+      let qty = parseInt(row.find(".quantity").val()) || 1;
+      row.find(".subtotal").text((price * qty).toFixed(2));
+
+      calculateTotal();
+  });
+
+  $("form").submit(function (event) {
+      if ($(".product-select").length === 0) {
+          alert("Please add at least one product.");
+          event.preventDefault();
+      }
+  });
+</script>
+
+{% endblock js %}

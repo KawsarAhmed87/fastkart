@@ -30,6 +30,7 @@ class ProductVariant(models.Model):
     attribute2_value = models.ForeignKey(AttributeValue, related_name='variants_with_attribute2', on_delete=models.SET_NULL, blank=True, null=True)
     image = models.ImageField(upload_to='product_images/', blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.BooleanField(default=True)  # True for active, False for inactive
     def __str__(self):
         attr1 = self.attribute1_value.value if self.attribute1_value else "N/A"
         attr2 = self.attribute2_value.value if self.attribute2_value else "N/A"

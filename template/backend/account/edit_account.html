@@ -1,0 +1,97 @@
+{% extends 'backend/master.html' %}
+{% block title %}Edit Account{% endblock title %}
+{% load static %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>Edit Account</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_account' %}">
+          <button class="btn btn-success btn-sm float-right">Account List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <form method="POST" action="{% url 'edit_account' account.id %}">
+          {% csrf_token %}
+
+          <!-- Display form-level errors -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %}
+                <p class="text-danger">{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <table class="table table-bordered">
+            <!-- Account Name field -->
+            <tr>
+              <td><label for="name">Account Name</label></td>
+              <td>
+                <input type="text" class="form-control" id="name" name="name" 
+                  value="{{ form.name.value|default_if_none:'' }}" placeholder="Enter account name" />
+                <span class="text-danger">{{ form.name.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Parent Account field -->
+            <tr>
+              <td><label for="parent">Parent Account</label></td>
+              <td>
+                <select class="form-control" id="parent" name="parent">
+                  <option value="">No Parent (Root Account)</option>
+                  {% for parent_account in parent_accounts %}
+                    <option value="{{ parent_account.id }}"
+                      {% if form.is_bound and form.parent.value == parent_account.id %}
+                        selected 
+                      {% elif not form.is_bound and account.parent and account.parent.id == parent_account.id %}
+                        selected
+                      {% endif %}>
+                      {{ parent_account.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger">{{ form.parent.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Status field as a switch button -->
+            <tr>
+              <td><label for="status">Status</label></td>
+              <td>
+                <label class="switch">
+                  <input type="checkbox" id="status" name="status" 
+                    {% if form.is_bound %}
+                      {% if form.status.value %} checked {% endif %}
+                    {% elif account.status %} checked {% endif %} 
+                  />
+                  <span class="slider round"></span>
+                </label>
+                <span class="text-danger">{{ form.status.errors.0 }}</span>
+              </td>
+            </tr>
+
+            <!-- Submit button -->
+            <tr>
+              <td colspan="2">
+                <input type="submit" class="btn btn-success btn-block" value="Update Account" />
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

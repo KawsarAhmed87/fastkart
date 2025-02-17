@@ -146,18 +146,23 @@ def delete_product(request, pk):
 
 def create_product_variant(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    attribute_values = AttributeValue.objects.all()
+
+    # Filter attribute values related to the product's attributes
+    attribute_values = AttributeValue.objects.filter(attribute__in=[product.attribute1, product.attribute2])
 
     if request.method == 'POST':
         form = ProductVariantForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            product_variant = form.save(commit=False)
+            product_variant.product = product  # Ensure variant is linked to product
+            product_variant.status = request.POST.get('status') == 'on'  # Convert checkbox value to boolean
+            product_variant.save()
             messages.success(request, 'Product Variant created successfully!')
-            return redirect('list_product_variants')
+            return redirect('list_product_variants', product_id=product.id)
         else:
             messages.error(request, 'Error creating Product Variant. Please check the form and try again.')
     else:
-        form = ProductVariantForm()
+        form = ProductVariantForm(initial={'status': True})  # Default status to Active
 
     context = {
         'form': form,
@@ -169,15 +174,14 @@ def create_product_variant(request, product_id):
 
 
 
-def edit_product_variant(request, id):
-    product_variant = get_object_or_404(ProductVariant, id=id)
-    products = Product.objects.all()
-    attribute_values = AttributeValue.objects.all()
+def edit_product_variant(request, product_id, variant_id):
+    product = get_object_or_404(Product, id=product_id)
+    variant = get_object_or_404(ProductVariant, id=variant_id, product=product)  # Ensure variant belongs to the product
     
-    old_image_path = product_variant.image.path if product_variant.image else None  
+    old_image_path = variant.image.path if variant.image else None  
 
     if request.method == 'POST':
-        form = ProductVariantForm(request.POST, request.FILES, instance=product_variant)
+        form = ProductVariantForm(request.POST, request.FILES, instance=variant)
         
         if form.is_valid():
             if 'image' in request.FILES and old_image_path and os.path.isfile(old_image_path):
@@ -185,30 +189,27 @@ def edit_product_variant(request, id):
 
             form.save()
             messages.success(request, 'Product Variant updated successfully')
-            return redirect('list_product_variants')
+            return redirect('list_product_variants', product_id=product.id)
         else:
             messages.error(request, 'Error updating Product Variant. Please try again.')
     else:
-        form = ProductVariantForm(instance=product_variant)
+        form = ProductVariantForm(instance=variant)
 
     context = {
-        'product_variant': product_variant,
+        'product': product,
+        'variant': variant,  # Ensure variant is passed
         'form': form,
-        'products': products,
-        'attribute_values': attribute_values,
     }
     return render(request, 'backend/product_variant/edit_product_variant.html', context)
 
 
-def list_product_variants(request):
-    product_variants = ProductVariant.objects.order_by('-id')
-    paginator = Paginator(product_variants, 10)
-    page = request.GET.get('page')
-    product_variants = paginator.get_page(page)
-    
+def list_product_variants(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    variants = ProductVariant.objects.filter(product=product)
+
     context = {
-        'product_variants': product_variants,
-        'link': 'list_product_variants'
+        'product': product,
+        'variants': variants
     }
     return render(request, 'backend/product_variant/list_product_variants.html', context)
 
@@ -223,16 +224,26 @@ def view_product_variant(request, id):
 
 
 @require_POST
-def delete_product_variant(request, pk):
+def delete_product_variant(request, variant_id):
     if request.method == 'POST':
         try:
-            product_variant = get_object_or_404(ProductVariant, pk=pk)
-            if product_variant.image and os.path.isfile(product_variant.image.path):
-                os.remove(product_variant.image.path)
-            product_variant.delete()
-            messages.info(request, 'Product Variant deleted successfully.')
+            # Fetch and delete the specified variant
+            variant = get_object_or_404(ProductVariant, id=variant_id)
+
+            # Check if the variant has an image and delete it from storage
+            if variant.image:
+                if os.path.isfile(variant.image.path):
+                    os.remove(variant.image.path)
+            
+            variant.delete()
+            messages.info(request, 'Variant deleted successfully.')
+
+            # Return a success response for AJAX handling
             return JsonResponse({'success': True})
+        
         except Exception as e:
+            # Log the error if needed and return an error response for AJAX handling
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
+    # If not a POST request, return an error response
     return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)

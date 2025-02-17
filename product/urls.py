@@ -12,6 +12,6 @@ urlpatterns = [
     path('product/<int:product_id>/variants/', list_product_variants, name='list_product_variants'),
     path('product/<int:product_id>/variant/<int:variant_id>/edit/', edit_product_variant, name='edit_product_variant'),
     path('product/<int:product_id>/variant/<int:variant_id>/view/', view_product_variant, name='view_product_variant'),
-    path('product/<int:product_id>/variant/<int:variant_id>/delete/', delete_product_variant, name='delete_product_variant'),
+    path('product/variant/<int:variant_id>/delete/', delete_product_variant, name='delete_product_variant'),
 
 ]

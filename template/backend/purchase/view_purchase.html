@@ -1,0 +1,137 @@
+{% extends 'backend/master.html' %}
+
+{% block title %}View Purchase{% endblock title %}
+{% load static %}
+
+{% block content %}
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1>View Purchase</h1>
+      </div>
+      <div class="col-sm-6">
+        <a href="{% url 'list_purchase' %}">
+          <button class="btn btn-success btn-sm float-right">Purchase List</button>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-default">
+      <div class="card-body">
+        <table class="table table-bordered">
+          <tr>
+            <td><label for="purchase_date">Purchase Date</label></td>
+            <td>{{ purchase.date|date:'Y-m-d' }}</td>
+          </tr>
+
+          <tr>
+            <td><label>Paid By</label></td>
+            <td>{{ credit_entry.account.name }}</td>
+          </tr>
+
+          <tr>
+            <td><label>Supplier</label></td>
+            <td>{{ purchase.supplier.name }}</td>
+          </tr>
+
+          <tr>
+            <td><label>Total Amount</label></td>
+            <td>{{ purchase.total_amount }}</td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <h3>Products</h3>
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for data in recorded_variants %}
+                  <tr>
+                    <td>{{ data.product_variant.product.name }} ({{ data.product_variant.attribute1_value.attribute.name }}:{{ data.product_variant.attribute1_value.value }},
+                        {{ data.product_variant.attribute2_value.attribute.name }}:{{ data.product_variant.attribute2_value.value }})</td>
+                    <td>{{ data.amount }}</td>
+                    <td>{{ data.quantity }}</td>
+                    <td>{{ data.sub_total }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+
+        <a href="{% url 'edit_purchase' purchase.pk %}">
+          <button class="btn btn-primary btn-sm">Edit Purchase</button>
+        </a>
+        <button type="button" class="btn btn-danger btn-sm delete-button" data-id="{{ purchase.pk }}">Delete Purchase</button>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.all.min.js"></script>
+
+<script>
+  $(document).on('click', '.delete-button', function(e) {
+    e.preventDefault();
+    var button = $(this);
+    var purchaseId = button.data('id');
+
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will not be able to recover this purchase!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          type: 'POST',
+          url: `/purchase/${purchaseId}/delete/`,
+          data: {
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          beforeSend: function() {
+            button.prop('disabled', true).text('Deleting...');
+          },
+          success: function(response) {
+            if (response.success) {
+              Swal.fire({
+                title: 'Deleted!',
+                text: 'Your purchase has been deleted.',
+                icon: 'success'
+              }).then(() => {
+                window.location.href = "{% url 'list_purchase' %}"; // Redirect to purchase list
+              });
+            } else {
+              Swal.fire('Error!', response.error || 'There was an error deleting the purchase.', 'error');
+            }
+          },
+          error: function() {
+            Swal.fire('Error!', 'There was an error deleting the purchase.', 'error');
+          },
+          complete: function() {
+            button.prop('disabled', false).text('Delete Purchase');
+          }
+        });
+      }
+    });
+  });
+</script>
+{% endblock js %}

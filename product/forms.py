@@ -20,5 +20,6 @@ class ProductForm(forms.ModelForm):
 class ProductVariantForm(forms.ModelForm):
     class Meta:
         model = ProductVariant
-        fields = ['product', 'attribute1_value', 'attribute2_value', 'image', 'price']
+        fields = ['attribute1_value', 'attribute2_value', 'image', 'price', 'status']
+  
     

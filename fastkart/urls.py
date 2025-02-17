@@ -18,6 +18,8 @@ urlpatterns = [
     path('', include('supplier.urls')),
     path('', include('attribute.urls')),
     path('', include('product.urls')),
+    path('', include('purchase.urls')),
+    path('', include('account.urls')),
 ]
 
 

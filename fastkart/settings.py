@@ -45,6 +45,11 @@ INSTALLED_APPS = [
     'supplier',
     'attribute',
     'product',
+    'account',
+    'transaction',
+    'journalentry',
+    'stock',
+    'purchase',
 ]
 
 MIDDLEWARE = [
